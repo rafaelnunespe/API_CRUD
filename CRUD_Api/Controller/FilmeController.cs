@@ -1,4 +1,5 @@
-﻿using CRUD_Api.Data;
+﻿using AutoMapper;
+using CRUD_Api.Data;
 using CRUD_Api.Data.Dto;
 using CRUD_Api.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -13,21 +14,19 @@ namespace CRUD_Api.Controller
     public class FilmeController : ControllerBase
     {
         private FilmeContext _context;
+        private IMapper _mapper;
 
-        public FilmeController(FilmeContext context)
+        public FilmeController(FilmeContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
+
 
         [HttpPost]
         public IActionResult AdicionarFilme([FromBody] CreateFilmeDto filmeDto)
         {
-            Filme filme = new Filme
-            {
-                Titulo = filmeDto.Titulo,
-                Duracao = filmeDto.Duracao,
-                Genero = filmeDto.Genero
-            };
+            Filme filme = _mapper.Map<Filme>(filmeDto);
 
             _context.Filmes.Add(filme);
             _context.SaveChanges();
@@ -46,14 +45,7 @@ namespace CRUD_Api.Controller
             Filme filme = _context.Filmes.FirstOrDefault(filme => filme.Id_Filme == id);
             if (filme != null)
             {
-                ReadFilmeDto filmeDto = new ReadFilmeDto
-                {
-                    Id_Filme = filme.Id_Filme,
-                    Titulo = filme.Titulo,
-                    Duracao = filme.Duracao,
-                    Genero = filme.Genero,
-                    HoraDaConsulta = DateTime.Now
-                };
+                ReadFilmeDto filmeDto = _mapper.Map<ReadFilmeDto>(filme);
                 return Ok(filmeDto);
             }
             return NotFound();
@@ -67,9 +59,7 @@ namespace CRUD_Api.Controller
             {
                 return NotFound();
             }
-            filme.Titulo = filmeDto.Titulo;
-            filme.Duracao = filmeDto.Duracao;
-            filme.Genero = filmeDto.Genero;
+            _mapper.Map(filmeDto, filme);
             _context.SaveChanges();
             return NoContent();
         }
