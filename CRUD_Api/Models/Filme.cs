@@ -6,7 +6,7 @@ namespace CRUD_Api.Models
     {
         [Key]
         [Required]
-        public int Id { get; set; }
+        public int Id_Filme { get; set; }
 
         [Required(ErrorMessage = "O campo título é obrigatório")]
         public string Titulo { get; set; }
